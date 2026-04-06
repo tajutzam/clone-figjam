@@ -1,11 +1,15 @@
+import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 import { Canvas } from "./components/Canvas";
+import { Dashboard } from "./pages/Dashboard";
 
-function App() {
+export default function App() {
     return (
-        <div className="w-screen h-screen">
-            <Canvas />
-        </div>
+        <BrowserRouter>
+            <Routes>
+                <Route path="/" element={<Dashboard />} />
+
+                <Route path="/room/:roomId" element={<Canvas />} />
+            </Routes>
+        </BrowserRouter>
     );
 }
-
-export default App;
