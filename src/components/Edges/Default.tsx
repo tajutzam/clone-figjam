@@ -9,8 +9,8 @@ export function Default({
   sourcePosition,
   targetPosition,
   style = {},
-  data,
   markerEnd,
+  selected, // Prop otomatis dari React Flow saat edge diklik
 }: EdgeProps) {
   const [edgePath] = getSmoothStepPath({
     sourceX,
@@ -22,12 +22,33 @@ export function Default({
   });
 
   return (
-    <path
-      id={id}
-      style={style}
-      className="stroke-2 fill-none stroke-zinc-300"
-      d={edgePath}
-      markerEnd={markerEnd}
-    />
+    <>
+      {/* Path "Hitbox": 
+                Dibuat transparan tapi tebal (strokeWidth 15) 
+                supaya user gampang nge-klik garis yang tipis.
+            */}
+      <path
+        d={edgePath}
+        fill="none"
+        strokeWidth={15}
+        stroke="transparent"
+        className="cursor-pointer"
+      />
+
+     
+      <path
+        id={id}
+        style={style}
+        d={edgePath}
+        markerEnd={markerEnd}
+        className={`
+                    fill-none transition-all duration-200 cursor-pointer
+                    ${selected
+            ? 'stroke-red-200 stroke-[3px] drop-shadow-sm'
+            : 'stroke-zinc-300 stroke-2'
+          }
+                `}
+      />
+    </>
   );
 }

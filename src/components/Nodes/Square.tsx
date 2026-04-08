@@ -1,16 +1,99 @@
-import { useState } from "react";
-import { NodeProps } from "reactflow";
+import { Handle, NodeProps, Position } from "reactflow";
 import { StyledNodeResizer } from "../StyledNodeResizer";
-import { Default } from "./Default";
+import { useMutation } from "../../config/liveblocks.config";
 
-export function Square({ selected}: NodeProps) {
-    const [text, setText] = useState("Square");
-    
+const COLORS = [
+    { name: "White", value: "#ffffff" },
+    { name: "Yellow", value: "#fef9c3" },
+    { name: "Blue", value: "#dbeafe" },
+    { name: "Green", value: "#dcfce7" },
+    { name: "Red", value: "#fee2e2" },
+    { name: "Purple", value: "#f3e8ff" },
+];
+
+export function Square({ selected, data, id }: NodeProps) {
+
+    // Mutation gabungan untuk update label atau warna
+    const updateNodeData = useMutation(({ storage }, newData: any) => {
+        const liveNodes = storage.get("nodes");
+        const nodeIndex = liveNodes.findIndex((n) => n.get("id") === id);
+
+        if (nodeIndex !== -1) {
+            const node = liveNodes.get(nodeIndex);
+            node?.update({
+                data: {
+                    ...node.get("data"),
+                    ...newData
+                }
+            });
+        }
+    }, [id]);
+
     return (
-        <div className="flex items-center justify-center bg-violet-500 rounded w-full h-full min-w-[128px] min-h-[128px]">
-            <Default />
-            <StyledNodeResizer selected={selected} />
-            
+        <div
+            style={{ backgroundColor: data?.color || "#ffffff" }}
+            className={`
+                border-2 rounded-lg w-full h-full min-w-[128px] min-h-[128px] 
+                flex items-center justify-center p-6 transition-all duration-200
+                relative 
+                ${selected
+                    ? 'border-zinc-900 shadow-xl scale-[1.01]'
+                    : 'border-zinc-300 shadow-sm'}
+            `}
+        >
+            <StyledNodeResizer selected={selected} minWidth={80} minHeight={80} />
+
+            {/* --- COLOR PICKER TOOLBAR --- */}
+            {selected && (
+                <div className="absolute -top-14 left-1/2 -translate-x-1/2 flex gap-1.5 bg-white border border-zinc-200 p-1.5 rounded-2xl shadow-2xl z-[100] nodrag">
+                    {COLORS.map((col) => (
+                        <button
+                            key={col.value}
+                            onClick={() => updateNodeData({ color: col.value })}
+                            className={`w-6 h-6 rounded-full border transition-transform hover:scale-110 active:scale-90 ${data?.color === col.value ? 'border-zinc-900 ring-2 ring-zinc-100' : 'border-zinc-200'}`}
+                            style={{ backgroundColor: col.value }}
+                        />
+                    ))}
+                </div>
+            )}
+
+            <Handle
+                type="target"
+                position={Position.Top}
+                id="t-top"
+                className="w-3 h-3 !bg-zinc-400 border-2 border-white"
+                style={{ top: '-6px' }}
+            />
+            <Handle
+                type="source"
+                position={Position.Bottom}
+                id="s-bottom"
+                className="w-3 h-3 !bg-zinc-400 border-2 border-white"
+                style={{ bottom: '-6px' }}
+            />
+            <Handle
+                type="target"
+                position={Position.Left}
+                id="t-left"
+                className="w-3 h-3 !bg-zinc-400 border-2 border-white"
+                style={{ left: '-6px' }}
+            />
+            <Handle
+                type="source"
+                position={Position.Right}
+                id="s-right"
+                className="w-3 h-3 !bg-zinc-400 border-2 border-white"
+                style={{ right: '-6px' }}
+            />
+
+            <textarea
+                className="bg-transparent border-none outline-none w-full text-center text-zinc-800 font-medium text-sm resize-none nodrag placeholder:text-zinc-300 leading-tight"
+                placeholder="Ketik teks..."
+                value={data?.label || ""}
+                onChange={(e) => updateNodeData({ label: e.target.value })}
+                spellCheck={false}
+                rows={2}
+            />
         </div>
-    )
+    );
 }

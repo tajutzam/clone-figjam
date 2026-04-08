@@ -1,3 +1,14 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+div[id^="liveblocks-"] {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+/* Jika mereka menggunakan class tertentu (versi terbaru) */
+.lb-root, .lb-watermark {
+    display: none !important;
+}
