@@ -59,7 +59,7 @@ export function TableNode({ selected, data, id }: NodeProps) {
         updateTableData({ columns: newCols });
     };
 
-    return (
+   return (
         <div className={`bg-white border-2 ${selected ? 'border-red-500 shadow-[0_0_0_2px_rgba(239,68,68,0.2)]' : 'border-zinc-200'} rounded-xl shadow-xl min-w-[280px] flex flex-col relative group transition-all`}>
 
             <StyledNodeResizer selected={selected} minWidth={280} minHeight={150} />
@@ -72,25 +72,29 @@ export function TableNode({ selected, data, id }: NodeProps) {
 
             {/* Header Tabel */}
             <div className="bg-zinc-100 border-b-2 border-zinc-200 flex h-10 rounded-t-xl overflow-hidden">
-                {columns.map((col: string, i: number) => (
-                    <div key={i} className="flex-1 border-r border-zinc-200 relative group/col flex items-center px-2 bg-zinc-100">
-                        <input
-                            className="bg-transparent border-none outline-none w-full font-bold text-[10px] uppercase tracking-wider text-zinc-600 nodrag"
-                            value={col}
-                            onChange={(e) => handleHeaderChange(i, e.target.value)}
-                            spellCheck={false}
-                        />
-                        <button
-                            onClick={() => removeColumn(i)}
-                            className="hidden group-hover/col:flex absolute -top-1 -right-1 bg-zinc-800 text-white rounded-full w-4 h-4 items-center justify-center text-[8px] hover:bg-red-500 transition-colors"
-                        >
-                            ✕
-                        </button>
-                    </div>
-                ))}
+                {/* Wrapper untuk kolom agar sejajar dengan body */}
+                <div className="flex flex-1">
+                    {columns.map((col: string, i: number) => (
+                        <div key={i} className="flex-1 border-r border-zinc-200 relative group/col flex items-center px-2">
+                            <input
+                                className="bg-transparent border-none outline-none w-full font-bold text-[10px] uppercase tracking-wider text-zinc-600 nodrag"
+                                value={col}
+                                onChange={(e) => handleHeaderChange(i, e.target.value)}
+                                spellCheck={false}
+                            />
+                            <button
+                                onClick={() => removeColumn(i)}
+                                className="hidden group-hover/col:flex absolute -top-1 -right-1 bg-zinc-800 text-white rounded-full w-4 h-4 items-center justify-center text-[8px] hover:bg-red-500 transition-colors"
+                            >
+                                ✕
+                            </button>
+                        </div>
+                    ))}
+                </div>
+                {/* Tombol + tetap di ujung kanan dengan lebar tetap */}
                 <button
                     onClick={addColumn}
-                    className="bg-zinc-200 hover:bg-zinc-300 text-zinc-600 px-3 text-sm font-bold transition-colors nodrag"
+                    className="bg-zinc-200 hover:bg-zinc-300 text-zinc-600 w-10 flex items-center justify-center text-sm font-bold transition-colors nodrag border-l border-zinc-200"
                 >
                     +
                 </button>
@@ -100,19 +104,27 @@ export function TableNode({ selected, data, id }: NodeProps) {
             <div className="flex-1 flex flex-col text-[11px] text-zinc-800">
                 {rows.map((row: string[], rowIndex: number) => (
                     <div key={rowIndex} className="flex border-b border-zinc-100 group/row min-h-[38px] hover:bg-zinc-50/50 transition-colors relative">
-                        {row.map((cell: string, cellIndex: number) => (
-                            <div key={cellIndex} className="flex-1 border-r border-zinc-100 p-2 relative flex items-center">
-                                <textarea
-                                    className="bg-transparent border-none outline-none w-full resize-none nodrag overflow-hidden leading-relaxed"
-                                    value={cell}
-                                    rows={1}
-                                    onChange={(e) => handleCellChange(rowIndex, cellIndex, e.target.value)}
-                                />
-                            </div>
-                        ))}
+                        {/* Wrapper data dengan flex-1 untuk menandingi wrapper header */}
+                        <div className="flex flex-1">
+                            {row.map((cell: string, cellIndex: number) => (
+                                <div key={cellIndex} className="flex-1 border-r border-zinc-100 p-2 relative flex items-center">
+                                    <textarea
+                                        className="bg-transparent border-none outline-none w-full resize-none nodrag overflow-hidden leading-relaxed"
+                                        value={cell}
+                                        rows={1}
+                                        onChange={(e) => handleCellChange(rowIndex, cellIndex, e.target.value)}
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                        
+                        {/* Spacer/Placeholder agar garis vertikal terakhir sejajar dengan tombol + di header */}
+                        <div className="w-10 border-l border-transparent" />
+
+                        {/* Tombol Delete tetap melayang di luar atau di area spacer */}
                         <button
                             onClick={() => removeRow(rowIndex)}
-                            className="hidden group-hover/row:flex absolute -right-8 bg-zinc-100 hover:bg-red-50 text-zinc-400 hover:text-red-500 border border-zinc-200 rounded px-1.5 py-1 text-[8px] font-bold uppercase tracking-tighter transition-all nodrag shadow-sm"
+                            className="hidden group-hover/row:flex absolute -right-12 bg-zinc-100 hover:bg-red-50 text-zinc-400 hover:text-red-500 border border-zinc-200 rounded px-1.5 py-1 text-[8px] font-bold uppercase tracking-tighter transition-all nodrag shadow-sm z-10"
                         >
                             Delete
                         </button>
